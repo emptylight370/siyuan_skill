@@ -1,10 +1,12 @@
 # SiYuan CLI — Full Command Reference
 
-Auto-generated from `siyuan --help` output (v3.7.0-dev11).
+Auto-generated from `siyuan --help` output (v3.7.0-dev14).
 
 ---
 
 ## Top-Level Flags
+
+These flags are available on every subcommand (global flags):
 
 | Flag | Description |
 |------|-------------|
@@ -12,6 +14,7 @@ Auto-generated from `siyuan --help` output (v3.7.0-dev11).
 | `-h, --help` | Show help |
 | `-v, --version` | Print version |
 | `-w, --workspace <path>` | Workspace path (required for all commands except `workspace`) |
+| `--dry-run` | Dry run mode: validate and print what would happen without making changes |
 
 ---
 
@@ -42,12 +45,14 @@ siyuan notebook [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List all notebooks |
-| `create` | Create a notebook |
-| `rename` | Rename a notebook |
-| `remove` | Remove a notebook |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list` | | List all notebooks |
+| `create` | `--name <name>` | Create a notebook (ID auto-generated) |
+| `open` | `--id <id>` | Open a notebook |
+| `close` | `--id <id>` | Close a notebook |
+| `rename` | `--id <id> --name <name>` | Rename a notebook |
+| `remove` | `--id <id>` | Remove a notebook |
 
 ---
 
@@ -282,8 +287,8 @@ siyuan repo [command] -w <path>
 | `create` | Create a snapshot |
 | `diff` | Diff two snapshots |
 | `checkout` | Checkout (rollback to) a snapshot |
-| `tag` | Tag a snapshot |
-| `untag` | Remove a tag |
+| `tag` | `--id <id> --name <name>` | Tag a snapshot |
+| `untag` | `--name <name>` | Remove a tag |
 | `purge` | Purge old snapshots |
 | `search` | Search files in snapshots |
 | `file` | File-level snapshot operations (export/get/open/rollback) |
@@ -351,14 +356,14 @@ siyuan file [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List directory contents |
-| `read` | Read file content |
-| `write` | Write file content (stdin or `--file`) |
-| `copy` | Copy file or directory |
-| `rename` | Rename or move file |
-| `delete` | Delete file or directory |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list --path <path>` | | List directory contents |
+| `read --path <path>` | | Read file content |
+| `write <path> [--file <src>]` | `--file <src>` | Write file content (from stdin or file) |
+| `copy --src <src> --dst <dst>` | | Copy file or directory |
+| `rename --old <old> --new <new>` | | Rename or move file |
+| `delete --path <path>` | | Delete file or directory |
 
 ---
 

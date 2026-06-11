@@ -16,6 +16,8 @@ agent_created: true
 SiYuan Note provides a CLI (`siyuan`) to manage workspaces, notebooks, documents, blocks, and more.
 The binary must be available on `PATH` (verify with `siyuan --version`).
 
+> **CLI Version:** v3.7.0-dev14. Commands shown below reflect this version.
+
 ## Workflow
 
 Follow this sequence for every user request:
@@ -46,10 +48,13 @@ siyuan <subcommand> [args] -w /path/to/workspace -f json
 
 ## Global Flags
 
+These flags are available on every subcommand:
+
 | Flag | Description |
 |------|-------------|
 | `-w, --workspace <path>` | Workspace path (required for all commands except `workspace`) |
 | `-f, --format <table\|json>` | Output format (default: `table`) |
+| `--dry-run` | Validate and print what would happen without making changes |
 | `-h, --help` | Show help for any command |
 
 ## Subcommand Quick Reference
@@ -61,9 +66,11 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | **Workspace** | `workspace list` | List registered workspaces |
 | | `workspace info` | Show current workspace info |
 | **Notebook** | `notebook list` | List all notebooks |
-| | `notebook create` | Create a notebook |
-| | `notebook rename` | Rename a notebook |
-| | `notebook remove` | Remove a notebook |
+| | `notebook create --name <name>` | Create a notebook (ID auto-generated) |
+| | `notebook open --id <id>` | Open a notebook |
+| | `notebook close --id <id>` | Close a notebook |
+| | `notebook rename --id <id> --name <name>` | Rename a notebook |
+| | `notebook remove --id <id>` | Remove a notebook |
 | **Document** | `document list` | List documents in a notebook |
 | | `document get` | Get document info |
 | | `document create` | Create a document |
@@ -124,7 +131,8 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `repo create` | Create a snapshot |
 | | `repo diff` | Diff two snapshots |
 | | `repo checkout` | Checkout a snapshot |
-| | `repo tag` / `untag` | Tag/untag snapshot |
+| | `repo tag --id <id> --name <name>` | Tag a snapshot |
+| | `repo untag --name <name>` | Remove a tag |
 | | `repo purge` | Purge old snapshots |
 | | `repo search` | Search files in snapshots |
 | | `repo file` | File-level snapshot ops |
@@ -142,12 +150,12 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `database render` | Render database data |
 | | `database unused` | List unused databases |
 | | `database clean` | Clean unused databases |
-| **File** | `file list` | List directory contents |
-| | `file read` | Read file content |
-| | `file write` | Write file content |
-| | `file copy` | Copy file or directory |
-| | `file rename` | Rename/move file |
-| | `file delete` | Delete file or directory |
+| **File** | `file list --path <path>` | List directory contents |
+| | `file read --path <path>` | Read file content |
+| | `file write --path <path> [--file <src>]` | Write file content (stdin or --file) |
+| | `file copy --src <path> --dst <path>` | Copy file or directory |
+| | `file rename --old <path> --new <path>` | Rename/move file |
+| | `file delete --path <path>` | Delete file or directory |
 | **Serve** | `serve` | Start kernel HTTP server |
 
 ## Key Usage Patterns
@@ -189,4 +197,5 @@ siyuan import md --file ./notes/ --notebook <notebook-id> -w /path
 - Never omit `-w` for non-workspace subcommands; the CLI will target the default workspace otherwise.
 - Use `-f json` when the output needs to be parsed programmatically.
 - Block IDs are required for most `block`, `attr`, `ref` operations (`--id` flag).
+- Use `--dry-run` to validate a command without making changes (useful for destructive operations like `block delete`, `file delete`, `notebook remove`).
 - Load `references/commands.md` whenever a subcommand's detailed flags are needed.
