@@ -3,9 +3,9 @@ name: siyuan_skill
 description: >
   Operate SiYuan Note CLI (siyuan) to manage workspaces, notebooks, documents, blocks, SQL queries,
   search, export/import, assets, attributes, bookmarks, tags, history, refs, repo snapshots, sync, serve,
-  and database attribute views. Use this skill when the user mentions SiYuan, 思源笔记, or asks to
-  query/manipulate SiYuan data via CLI. The skill enforces the correct workflow: discover workspaces first,
-  then target a specific workspace for all subsequent commands.
+  database attribute views, templates, outlines, and system info. Use this skill when the user mentions
+  SiYuan, 思源笔记, or asks to query/manipulate SiYuan data via CLI. The skill enforces the correct
+  workflow: discover workspaces first, then target a specific workspace for all subsequent commands.
 agent_created: true
 ---
 
@@ -35,15 +35,21 @@ siyuan workspace info          # show current default workspace
 ### 2. Lock in the Workspace Path
 
 After the user selects a workspace (or provides a path directly), store the workspace path and use it
-as the `-w` argument for **all subsequent commands** (except `workspace` subcommands).
+as the `-w` argument for **all subsequent commands** (except `workspace` and `serve` subcommands).
+Note: `serve` command only accepts `--workspace` (full form, not `-w`), and it is optional as it defaults to the default workspace.
 
 ### 3. Execute the Requested Command
 
-Append `-w <workspace-path>` to every command (except `workspace` subcommands).
+Append `-w <workspace-path>` to every command (except `workspace` and `serve` subcommands).
+For `serve` command, use `--workspace <path>` if you need to specify a non-default workspace.
 Use `-f json` for programmatic output when parsing results.
 
 ```
+# For most commands
 siyuan <subcommand> [args] -w /path/to/workspace -f json
+
+# For serve command (optional)
+siyuan serve [flags] --workspace /path/to/workspace
 ```
 
 ## Global Flags
@@ -52,10 +58,12 @@ These flags are available on every subcommand:
 
 | Flag | Description |
 |------|-------------|
-| `-w, --workspace <path>` | Workspace path (required for all commands except `workspace`) |
+| `-w, --workspace <path>` | Workspace path (required for all commands except `workspace` and `serve`; note: `serve` only accepts `--workspace` full form, not `-w`, and it is optional as it defaults to the default workspace) |
 | `-f, --format <table\|json>` | Output format (default: `table`) |
 | `--dry-run` | Validate and print what would happen without making changes |
 | `-h, --help` | Show help for any command |
+
+> **Note:** All flags except `-w` (or `--workspace`) are optional. The CLI will use default values if optional flags are not specified.
 
 ## Subcommand Quick Reference
 
@@ -90,7 +98,8 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `block dom` | Get block DOM |
 | | `block kramdown` | Get block kramdown |
 | | `block breadcrumb` | Get block breadcrumb |
-| | `block info` | Get document info |
+| | `block batch-get --ids <ids>` | Batch get block info |
+| | `block batch-kramdown --ids <ids>` | Batch get block kramdown |
 | **SQL** | `sql "<statement>"` | Execute SQL query (`-l` sets limit) |
 | **Search** | `search <query>` | Full-text search |
 | **Export** | `export md --id <id>` | Export as Markdown |
@@ -104,10 +113,11 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `import sy` | Import `.sy.zip` |
 | | `import data` | Import data backup |
 | **Daily Note** | `dailynote create --notebook <id>` | Create today's daily note |
-| | `dailynote append --notebook <id> [--data <md>|--file <path>]` | Append block to today's daily note |
-| | `dailynote prepend --notebook <id> [--data <md>|--file <path>]` | Prepend block to today's daily note |
+| | `dailynote append --notebook <id> [--data <md>\|--file <path>]` | Append block to today's daily note |
+| | `dailynote prepend --notebook <id> [--data <md>\|--file <path>]` | Prepend block to today's daily note |
 | **Asset** | `asset unused` | List unused assets |
 | | `asset clean` | Clean unused assets |
+| | `asset stat --path <path>` | Show asset file info |
 | | `asset upload` | Upload files to assets |
 | **Attribute** | `attr get --id <id>` | Get block attributes |
 | | `attr set` | Set block attributes |
@@ -156,7 +166,22 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `file copy --src <path> --dst <path>` | Copy file or directory |
 | | `file rename --old <path> --new <path>` | Rename/move file |
 | | `file delete --path <path>` | Delete file or directory |
+| | `file find --path <path> [--pattern <pattern>]` | Find files under a path |
+| | `file grep --path <path> --pattern <pattern>` | Search file contents with regex |
+| | `file stat --path <path>` | Show file or directory info |
+| **Outline** | `outline get --id <id>` | Get document heading tree |
+| **Template** | `template search [keyword]` | Search/list templates |
+| | `template get --path <path>` | Read template content |
+| | `template create --name <name> [--data <md>\|--file <path>]` | Create a template from markdown |
+| | `template save-as --id <id> --name <name>` | Save document as template |
+| | `template render --path <path> --id <id>` | Render template against a block (preview) |
+| | `template remove --path <path>` | Remove a template |
+| **System** | `system current-time` | Show current server time |
 | **Serve** | `serve` | Start kernel HTTP server |
+| **CLI** | `completion bash` | Generate bash completion |
+| | `completion fish` | Generate fish completion |
+| | `completion powershell` | Generate powershell completion |
+| | `completion zsh` | Generate zsh completion |
 
 ## Key Usage Patterns
 
@@ -177,7 +202,7 @@ siyuan search "keyword" -w /path -f json
 # Flags: -m (method), -t (type filter), -n (notebook filter), -o (order), -p (page), -s (page-size)
 ```
 
-**Note:** `-m 4` (fuzzy/vector search) requires an embedding model to be configured and embeddings to be generated first. If fuzzy search returns no results or an error, remind the user to configure the embedding model in SiYuan settings and run embedding.
+> **Note:** `-m 4` (fuzzy/vector search) requires an embedding model to be configured and embeddings to be generated first. If fuzzy search returns no results or an error, remind the user to configure the embedding model in SiYuan settings and run embedding.
 
 ### Export a Document
 

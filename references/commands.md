@@ -16,6 +16,8 @@ These flags are available on every subcommand (global flags):
 | `-w, --workspace <path>` | Workspace path (required for all commands except `workspace`) |
 | `--dry-run` | Dry run mode: validate and print what would happen without making changes |
 
+> **Note:** All global flags except `-w` (or `--workspace`) are optional. The CLI will use default values if optional flags are not specified.
+
 ---
 
 ## workspace — Manage Workspaces
@@ -96,7 +98,8 @@ siyuan block [command] -w <path>
 | `dom` | `--id <id>` | Get block DOM |
 | `kramdown` | `--id <id>` | Get block kramdown |
 | `breadcrumb` | `--id <id>` | Get block breadcrumb |
-| `info` | `--id <id>` | Get document info |
+| `batch-get` | `--ids <ids>` | Batch get block info |
+| `batch-kramdown` | `--ids <ids>` | Batch get block kramdown |
 
 ---
 
@@ -185,11 +188,12 @@ siyuan asset [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `unused` | List unused assets |
-| `clean` | Clean unused assets |
-| `upload` | Upload files to workspace assets |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `unused` | | List unused assets |
+| `clean` | | Clean unused assets |
+| `stat` | `--path <path>` | Show asset file info |
+| `upload` | | Upload files to workspace assets |
 
 ---
 
@@ -364,16 +368,80 @@ siyuan file [command] -w <path>
 | `copy --src <src> --dst <dst>` | | Copy file or directory |
 | `rename --old <old> --new <new>` | | Rename or move file |
 | `delete --path <path>` | | Delete file or directory |
+| `find --path <path>` | `--pattern <pattern>` | Find files under a path |
+| `grep --path <path>` | `--pattern <pattern>` | Search file contents with regex |
+| `stat --path <path>` | | Show file or directory info |
+
+---
+
+## outline — Document Outline
+
+```
+siyuan outline [command] -w <path>
+```
+
+### Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `get --id <id>` | `--id <id>` | Get document outline (heading tree) |
+
+---
+
+## system — System Information
+
+```
+siyuan system [command] -w <path>
+```
+
+### Subcommands
+| Command | Description |
+|---------|-------------|
+| `current-time` | Show current server time |
+
+---
+
+## template — Manage Templates
+
+```
+siyuan template [command] -w <path>
+```
+
+### Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `search [keyword]` | | Search templates; empty keyword lists all |
+| `get --path <path>` | `--path <path>` | Read template content |
+| `create --name <name>` | `--name <name>` `--data <md>` `--file <path>` (`-` for stdin) `--overwrite` | Create template from markdown content |
+| `save-as --id <id> --name <name>` | `--id <id>` `--name <name>` `--overwrite` | Save a document as a template |
+| `render --path <path> --id <id>` | `--path <path>` `--id <id>` | Render template against a block (preview) |
+| `remove --path <path>` | `--path <path>` | Remove a template |
+
+> `--path` accepts absolute path or path relative to `data/templates/` in the workspace.
 
 ---
 
 ## serve — Start Kernel HTTP Server
 
 ```
-siyuan serve [flags] -w <path>
+siyuan serve [flags]
 ```
 
 Starts the SiYuan kernel HTTP server for API access.
+
+### Flags
+| Flag | Description |
+|------|-------------|
+| `--workspace <path>` | Workspace path (optional, defaults to default workspace if not specified; note: only full form `--workspace`, not `-w`) |
+| `--accessAuthCode <string>` | Access auth code |
+| `--attach-ui` | Attach kernel lifecycle to desktop UI process (used by Electron) |
+| `--lang <string>` | Language: ar/de/en/es/fr/he/hi/id/it/ja/ko/nl/pl/pt-BR/ru/sk/th/tr/uk/zh-CN/zh-TW |
+| `--mode <string>` | Run mode: dev/prod (default "prod") |
+| `--port <string>` | Port of the HTTP server (default "0" = auto) |
+| `--readonly <string>` | Read-only mode: true/false (default "false") |
+| `--ssl` | Enable HTTPS and WSS |
+| `--wd <string>` | Working directory of SiYuan |
+
+> **Note:** `serve` does not require `-w` flag; it starts the kernel which then loads the workspace.
 
 ---
 
