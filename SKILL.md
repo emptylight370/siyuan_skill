@@ -16,7 +16,7 @@ agent_created: true
 SiYuan Note provides a CLI (`siyuan`) to manage workspaces, notebooks, documents, blocks, and more.
 The binary must be available on `PATH` (verify with `siyuan --version`).
 
-> **CLI Version:** v3.7.0-dev14. Commands shown below reflect this version.
+> **CLI Version:** v3.7.0-dev15 (shown as v3.6.5). Commands shown below reflect this version.
 
 ## Workflow
 
@@ -35,13 +35,11 @@ siyuan workspace info          # show current default workspace
 ### 2. Lock in the Workspace Path
 
 After the user selects a workspace (or provides a path directly), store the workspace path and use it
-as the `-w` argument for **all subsequent commands** (except `workspace` and `serve` subcommands).
-Note: `serve` command only accepts `--workspace` (full form, not `-w`), and it is optional as it defaults to the default workspace.
+as the `-w` argument for **all subsequent commands** (except `workspace` subcommands).
 
 ### 3. Execute the Requested Command
 
-Append `-w <workspace-path>` to every command (except `workspace` and `serve` subcommands).
-For `serve` command, use `--workspace <path>` if you need to specify a non-default workspace.
+Append `-w <workspace-path>` to every command (except `workspace` subcommands).
 Use `-f json` for programmatic output when parsing results.
 
 ```
@@ -79,96 +77,101 @@ Load `references/commands.md` for full `--help` output of every subcommand.
 | | `notebook close --id <id>` | Close a notebook |
 | | `notebook rename --id <id> --name <name>` | Rename a notebook |
 | | `notebook remove --id <id>` | Remove a notebook |
-| **Document** | `document list` | List documents in a notebook |
-| | `document get` | Get document info |
-| | `document create` | Create a document |
-| | `document rename` | Rename a document |
-| | `document move` | Move a document |
-| | `document duplicate` | Duplicate a document |
-| | `document remove` | Remove a document |
-| **Block** | `block get` | Get block info (`--id`) |
-| | `block children` | Get child blocks |
-| | `block insert` | Insert block |
-| | `block append` | Append block |
-| | `block prepend` | Prepend block |
-| | `block update` | Update block |
-| | `block delete` | Delete block |
-| | `block move` | Move block |
-| | `block stat` | Get block content statistics |
-| | `block dom` | Get block DOM |
-| | `block kramdown` | Get block kramdown |
-| | `block breadcrumb` | Get block breadcrumb |
+| **Document** | `document list --notebook <id> [--hpath <path>\|--path <path>]` | List documents in a notebook |
+| | `document get --id <id>` | Get document info |
+| | `document info --id <id>` | Get document info |
+| | `document create --notebook <id> --title <title> [--path <path>] [--markdown <md>]` | Create a document |
+| | `document rename --id <id> --title <title>` | Rename a document |
+| | `document move --id <id> --notebook <id> [--hpath <path>\|--path <path>]` | Move a document to another notebook |
+| | `document duplicate --id <id>` | Duplicate a document |
+| | `document remove --id <id>` | Remove a document |
+| | `document search <keyword>` | Search documents by keyword |
+| **Block** | `block get --id <id>` | Get block info |
+| | `block children --id <id>` | Get child blocks |
+| | `block insert --parent <id> [--data <md>\|--file <path>] [--previous <id>]` | Insert block |
+| | `block append --parent <id> [--data <md>\|--file <path>]` | Append block |
+| | `block prepend --parent <id> [--data <md>\|--file <path>]` | Prepend block |
+| | `block update --id <id> [--data <md>\|--file <path>]` | Update block |
+| | `block delete --id <id>` | Delete block |
+| | `block move --id <id> --parent <id> [--previous <id>]` | Move block |
+| | `block stat --id <id>` | Get block content statistics |
+| | `block dom --id <id>` | Get block DOM |
+| | `block kramdown --id <id> [--mode md\|textmark]` | Get block kramdown |
+| | `block breadcrumb --id <id>` | Get block breadcrumb |
 | | `block batch-get --ids <ids>` | Batch get block info |
 | | `block batch-kramdown --ids <ids>` | Batch get block kramdown |
 | **SQL** | `sql "<statement>"` | Execute SQL query (`-l` sets limit) |
 | **Search** | `search <query>` | Full-text search |
-| **Export** | `export md --id <id>` | Export as Markdown |
-| | `export html` | Export as HTML |
-| | `export docx` | Export as Word |
-| | `export sy` | Export as `.sy.zip` |
-| | `export md-zip` | Export as Markdown zip |
-| | `export preview` | Export as preview HTML |
-| | `export data` | Export full workspace backup |
-| **Import** | `import md --file <path> --notebook <id>` | Import Markdown |
-| | `import sy` | Import `.sy.zip` |
-| | `import data` | Import data backup |
+| **Export** | `export md --id <id> [--output <path>]` | Export as Markdown (default: stdout) |
+| | `export html --id <id> [--output <path>]` | Export as HTML (default: stdout) |
+| | `export docx --id <id> --output <file>` | Export as Word (.docx), --output required |
+| | `export sy --id <id> [--output <dir>]` | Export as `.sy.zip` (default: print temp path) |
+| | `export md-zip --id <id> [--output <file>]` | Export as Markdown zip (default: print temp path) |
+| | `export preview --id <id> [--output <path>]` | Export as preview HTML (default: stdout) |
+| | `export data [--output <file>]` | Export full workspace data backup |
+| **Import** | `import md --file <path> --notebook <id> [--hpath <path>\|--path <path>]` | Import Markdown file or directory |
+| | `import sy --file <path> --notebook <id> [--hpath <path>\|--path <path>]` | Import `.sy.zip` archive |
+| | `import data --file <path>` | Import data backup |
 | **Daily Note** | `dailynote create --notebook <id>` | Create today's daily note |
 | | `dailynote append --notebook <id> [--data <md>\|--file <path>]` | Append block to today's daily note |
 | | `dailynote prepend --notebook <id> [--data <md>\|--file <path>]` | Prepend block to today's daily note |
 | **Asset** | `asset unused` | List unused assets |
-| | `asset clean` | Clean unused assets |
-| | `asset stat --path <path>` | Show asset file info |
-| | `asset upload` | Upload files to assets |
+| | `asset clean [--path <path>]` | Clean unused assets (optional: single unused asset path) |
+| | `asset stat --path <path>` | Show asset file info (path relative to data dir) |
+| | `asset upload --id <id> --file <path>` | Upload files to assets (--file repeatable) |
 | **Attribute** | `attr get --id <id>` | Get block attributes |
-| | `attr set` | Set block attributes |
-| | `attr batch-get` | Batch get attributes |
+| | `attr set --id <id> --attr name=value` | Set block attributes (--attr repeatable) |
+| | `attr batch-get --ids <ids>` | Batch get block attributes |
 | **Bookmark** | `bookmark list` | List bookmarks |
 | | `bookmark labels` | List bookmark labels |
-| | `bookmark rename` | Rename a bookmark |
-| | `bookmark remove` | Remove a bookmark |
-| **Tag** | `tag list` | List tags |
-| | `tag rename` | Rename a tag |
-| | `tag remove` | Remove a tag |
-| **History** | `history list` | List all history |
-| | `history get` | Get historical file content |
-| | `history search` | Search history |
-| | `history rollback` | Rollback a document |
+| | `bookmark rename --old <old> --new <new>` | Rename a bookmark |
+| | `bookmark remove --label <label>` | Remove a bookmark |
+| **Tag** | `tag list [--keyword <keyword>]` | List tags (empty keyword = all) |
+| | `tag rename --old <old-label> --new <new-label>` | Rename a tag |
+| | `tag remove --label <label>` | Remove a tag |
+| **History** | `history list [--notebook <id>] [--op <op>] [-p <page>] [-t <type>]` | List all history |
+| | `history get --path <path>` | Get historical file content |
+| | `history search <query> [--notebook <id>] [--op <op>] [-p <page>] [-t <type>]` | Search history |
+| | `history rollback --path <path>` | Rollback a document |
 | | `history clear` | Clear all history |
 | **Ref** | `ref backlinks --id <id>` | Get backlinks |
 | | `ref mentions --id <id>` | Get mentions |
 | | `ref refresh --id <id>` | Refresh backlinks |
-| **Repo** | `repo list` | List snapshots |
-| | `repo create` | Create a snapshot |
-| | `repo diff` | Diff two snapshots |
-| | `repo checkout` | Checkout a snapshot |
+| **Repo** | `repo list [-p <page>] [--tag]` | List snapshots (--tag: tagged only) |
+| | `repo create [--memo <memo>]` | Create a snapshot |
+| | `repo diff --left <id> --right <id>` | Diff two snapshots |
+| | `repo checkout --id <id>` | Checkout (rollback to) a snapshot |
 | | `repo tag --id <id> --name <name>` | Tag a snapshot |
 | | `repo untag --name <name>` | Remove a tag |
 | | `repo purge` | Purge old snapshots |
-| | `repo search` | Search files in snapshots |
-| | `repo file` | File-level snapshot ops |
+| | `repo search <keyword> [-p <page>]` | Search files in snapshots |
+| | `repo file export --snapshot <id> --file <path>` | Export file from snapshot |
+| | `repo file get --snapshot <id> --file <path>` | Get file content from snapshot |
+| | `repo file open --snapshot <id> --file <path>` | Preview file from snapshot |
+| | `repo file rollback --snapshot <id> --file <path>` | Rollback a file from snapshot |
 | **Sync** | `sync pull` | Download from cloud |
 | | `sync push` | Upload to cloud |
 | | `sync status` | Show sync status |
-| **Database** | `database search` | Search databases by name |
-| | `database get` | Get database content |
-| | `database keys` | List database keys |
-| | `database key add` | Add a key (field) |
-| | `database key remove` | Remove a key |
-| | `database item add` | Add a row |
-| | `database item update` | Update a cell |
-| | `database item remove` | Remove rows |
-| | `database render` | Render database data |
+| **Database** | `database search <keyword>` | Search databases by name |
+| | `database get --av <avID>` | Get database content |
+| | `database keys --av <avID>` | List database keys |
+| | `database render --av <avID> [-p <page>] [-s <size>]` | Render database data |
 | | `database unused` | List unused databases |
-| | `database clean` | Clean unused databases |
-| **File** | `file list --path <path>` | List directory contents |
-| | `file read --path <path>` | Read file content |
-| | `file write --path <path> [--file <src>]` | Write file content (stdin or --file) |
-| | `file copy --src <path> --dst <path>` | Copy file or directory |
-| | `file rename --old <path> --new <path>` | Rename/move file |
-| | `file delete --path <path>` | Delete file or directory |
-| | `file find --path <path> [--pattern <pattern>]` | Find files under a path |
-| | `file grep --path <path> --pattern <pattern>` | Search file contents with regex |
-| | `file stat --path <path>` | Show file or directory info |
+| | `database clean [--av <avID>]` | Clean unused databases |
+| | `database key add --av <avID> --name <name> --type <type>` | Add a key (field) |
+| | `database key remove --av <avID> --key <keyID>` | Remove a key |
+| | `database item add --av <avID>` | Add a row |
+| | `database item update --av <avID> --key <keyID> --item <itemID> --value <json>` | Update a cell |
+| | `database item remove --av <avID> --ids <ids>` | Remove rows |
+| **File** | `file list <path>` | List directory contents |
+| | `file read <path>` | Read file content |
+| | `file write <path> [--file <src>]` | Write file content (stdin or --file) |
+| | `file copy <src> <dst>` | Copy file or directory |
+| | `file rename <old> <new>` | Rename/move file |
+| | `file delete <path>` | Delete file or directory |
+| | `file find <path> [--include <glob>] [--limit <int>]` | Find files under a path |
+| | `file grep --pattern <regex> --path <path> [--context <int>]` | Search file contents with regex |
+| | `file stat <path>` | Show file or directory info |
 | **Outline** | `outline get --id <id>` | Get document heading tree |
 | **Template** | `template search [keyword]` | Search/list templates |
 | | `template get --path <path>` | Read template content |

@@ -65,15 +65,18 @@ siyuan document [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List documents in a notebook |
-| `get` | Get document info |
-| `create` | Create a document |
-| `rename` | Rename a document |
-| `move` | Move a document to another notebook |
-| `duplicate` | Duplicate a document |
-| `remove` | Remove a document |
+### Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list --notebook <id>` | `--hpath <path>` `--path <path>` | List documents in a notebook |
+| `get --id <id>` | `--id <id>` | Get document info |
+| `info --id <id>` | `--id <id>` | Get document info |
+| `create --notebook <id> --title <title>` | `--path <path>` `--markdown <md>` | Create a document |
+| `rename --id <id> --title <title>` | `--id <id>` `--title <title>` | Rename a document |
+| `move --id <id> --notebook <id>` | `--hpath <path>` `--path <path>` | Move a document to another notebook |
+| `duplicate --id <id>` | `--id <id>` | Duplicate a document |
+| `remove --id <id>` | `--id <id>` | Remove a document |
+| `search <keyword>` | | Search documents by keyword |
 
 ---
 
@@ -86,17 +89,20 @@ siyuan block [command] -w <path>
 ### Subcommands
 | Command | Flags | Description |
 |---------|-------|-------------|
-| `get` | `--id <id>` | Get block info |
-| `children` | `--id <id>` | Get child blocks |
-| `insert` | `--id <id>` | Insert block |
-| `append` | `--id <id>` | Append block |
-| `prepend` | `--id <id>` | Prepend block |
-| `stat` | | Get block content statistics |
-| `update` | `--id <id>` | Update block |
-| `delete` | `--id <id>` | Delete block |
-| `move` | `--id <id>` | Move block |
-| `dom` | `--id <id>` | Get block DOM |
-| `kramdown` | `--id <id>` | Get block kramdown |
+| `get --id <id>` | `--id <id>` | Get block info |
+| `children --id <id>` | `--id <id>` | Get child blocks |
+| `insert --parent <id>` | `--parent <id>` `--data <md>` `--file <path>` `--previous <id>` | Insert block |
+| `append --parent <id>` | `--parent <id>` `--data <md>` `--file <path>` | Append block |
+| `prepend --parent <id>` | `--parent <id>` `--data <md>` `--file <path>` | Prepend block |
+| `stat --id <id>` | `--id <id>` | Get block content statistics |
+| `update --id <id>` | `--id <id>` `--data <md>` `--file <path>` | Update block |
+| `delete --id <id>` | `--id <id>` | Delete block |
+| `move --id <id> --parent <id>` | `--id <id>` `--parent <id>` `--previous <id>` | Move block |
+| `dom --id <id>` | `--id <id>` | Get block DOM |
+| `kramdown --id <id>` | `--id <id>` `--mode md\|textmark` | Get block kramdown |
+| `breadcrumb --id <id>` | `--id <id>` | Get block breadcrumb |
+| `batch-get --ids <ids>` | `--ids <id1,id2,...>` | Batch get block info |
+| `batch-kramdown --ids <ids>` | `--ids <id1,id2,...>` | Batch get block kramdown |
 | `breadcrumb` | `--id <id>` | Get block breadcrumb |
 | `batch-get` | `--ids <ids>` | Batch get block info |
 | `batch-kramdown` | `--ids <ids>` | Batch get block kramdown |
@@ -156,13 +162,13 @@ siyuan export [command] -w <path>
 ### Subcommands
 | Command | Flags | Description |
 |---------|-------|-------------|
-| `md --id <id> [--output <path>]` | | Export as Markdown (default: stdout) |
-| `html` | | Export as HTML |
-| `docx` | | Export as Word (.docx) |
-| `sy` | | Export as .sy.zip |
-| `md-zip` | | Export as Markdown zip |
-| `preview` | | Export as preview HTML |
-| `data` | | Export full workspace data backup |
+| `md --id <id>` | `--output <path>` (default: stdout) | Export as Markdown |
+| `html --id <id>` | `--output <path>` (default: stdout) | Export as HTML |
+| `docx --id <id>` | `--output <file>` (required) | Export as Word (.docx) |
+| `sy --id <id>` | `--output <dir>` (default: print temp path) | Export as .sy.zip |
+| `md-zip --id <id>` | `--output <file>` (default: print temp path) | Export as Markdown zip |
+| `preview --id <id>` | `--output <path>` (default: stdout) | Export as preview HTML |
+| `data` | `--output <file>` (default: print temp path) | Export full workspace data backup |
 
 ---
 
@@ -175,9 +181,9 @@ siyuan import [command] -w <path>
 ### Subcommands
 | Command | Flags | Description |
 |---------|-------|-------------|
-| `md --file <path> --notebook <id>` | `--hpath <path>` `--path <path>` | Import Markdown file or directory |
-| `sy` | | Import .sy.zip archive |
-| `data` | | Import data backup |
+| `md --file <path> --notebook <id>` | `--hpath <path>` `--path <path>` (default: /) | Import Markdown file or directory |
+| `sy --file <path> --notebook <id>` | `--hpath <path>` `--path <path>` (default: /) | Import .sy.zip archive |
+| `data --file <path>` | | Import data backup |
 
 ---
 
@@ -191,9 +197,9 @@ siyuan asset [command] -w <path>
 | Command | Flags | Description |
 |---------|-------|-------------|
 | `unused` | | List unused assets |
-| `clean` | | Clean unused assets |
-| `stat` | `--path <path>` | Show asset file info |
-| `upload` | | Upload files to workspace assets |
+| `clean` | `--path <path>` (optional, single unused asset path to remove) | Clean unused assets |
+| `stat --path <path>` | `--path <path>` (asset path relative to data dir, e.g. assets/image/xxx.png) | Show asset file info |
+| `upload --id <id> --file <path>` | `--id <id>` `--file <path>` (repeatable) | Upload files to workspace assets |
 
 ---
 
@@ -204,11 +210,28 @@ siyuan attr [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `get --id <id>` | Get block attributes |
-| `set` | Set block attributes |
-| `batch-get` | Batch get block attributes |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `get --id <id>` | `--id <id>` | Get block attributes |
+| `set --id <id> --attr name=value` | `--id <id>` `--attr name=value` (repeatable) | Set block attributes |
+| `batch-get --ids <ids>` | `--ids <id1,id2,...>` | Batch get block attributes |
+
+### Common Attributes for `attr set`
+- `icon` - Emoji hex codepoint (e.g. "1f4ca"), emoji character (e.g. "📊"), custom image path (e.g. "1/b3log.png"), or dynamic icon URL
+- `title-img` - CSS background-image format (e.g. 'background-image:url("assets/example.jpg")')
+- `tags` - Comma-separated tag names
+
+### Examples
+```bash
+# Set icon attribute
+siyuan attr set --id 20260605100657-v080a4j --attr icon=1f4ca -w /path
+
+# Set title image
+siyuan attr set --id 20260605100657-v080a4j --attr title-img='background-image:url("assets/example.jpg")' -w /path
+
+# Set tags
+siyuan attr set --id 20260605100657-v080a4j --attr tags=tag1,tag2 -w /path
+```
 
 ---
 
@@ -219,12 +242,12 @@ siyuan bookmark [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List bookmarks |
-| `labels` | List bookmark labels |
-| `rename` | Rename a bookmark |
-| `remove` | Remove a bookmark |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list` | | List bookmarks |
+| `labels` | | List bookmark labels |
+| `rename --old <old> --new <new>` | `--old <old>` `--new <new>` | Rename a bookmark |
+| `remove --label <label>` | `--label <label>` | Remove a bookmark |
 
 ---
 
@@ -235,11 +258,11 @@ siyuan tag [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List tags |
-| `rename` | Rename a tag |
-| `remove` | Remove a tag |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list` | `--keyword <keyword>` (empty = all) | List tags |
+| `rename --old <old-label> --new <new-label>` | `--old <old-label>` `--new <new-label>` | Rename a tag |
+| `remove --label <label>` | `--label <label>` | Remove a tag |
 
 ---
 
@@ -250,13 +273,19 @@ siyuan history [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List all history |
-| `get` | Get historical file content |
-| `search` | Search history |
-| `rollback` | Rollback a document to historical version |
-| `clear` | Clear all history |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list` | `--notebook <id>` `--op <op>` `-p, --page <int>` `-t, --type <int>` | List all history |
+| `get --path <path>` | `--path <path>` | Get historical file content |
+| `search <query>` | `--notebook <id>` `--op <op>` `-p, --page <int>` `-t, --type <int>` | Search history |
+| `rollback --path <path>` | `--path <path>` | Rollback a document to historical version |
+| `clear` | | Clear all history |
+
+### History Type Values (`-t, --type`)
+0=doc-name 1=doc-content 2=asset 3=doc-id 4=database
+
+### Operation Filter (`--op`)
+delete, update, create
 
 ---
 
@@ -285,17 +314,25 @@ siyuan repo [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `list` | List snapshots |
-| `create` | Create a snapshot |
-| `diff` | Diff two snapshots |
-| `checkout` | Checkout (rollback to) a snapshot |
-| `tag` | `--id <id> --name <name>` | Tag a snapshot |
-| `untag` | `--name <name>` | Remove a tag |
-| `purge` | Purge old snapshots |
-| `search` | Search files in snapshots |
-| `file` | File-level snapshot operations (export/get/open/rollback) |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `list` | `-p, --page <int>` `--tag` (tagged only) | List snapshots |
+| `create` | `--memo <string>` | Create a snapshot |
+| `diff --left <id> --right <id>` | `--left <id>` `--right <id>` | Diff two snapshots |
+| `checkout --id <id>` | `--id <id>` | Checkout (rollback to) a snapshot |
+| `tag --id <id> --name <name>` | `--id <id>` `--name <name>` | Tag a snapshot |
+| `untag --name <name>` | `--name <name>` | Remove a tag |
+| `purge` | | Purge old snapshots |
+| `search <keyword>` | `-p, --page <int>` | Search files in snapshots |
+| `file` | | File-level snapshot operations |
+
+### repo file — Nested Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `export --snapshot <id> --file <path>` | `--snapshot <id>` `--file <path>` | Export file from snapshot to temp file |
+| `get --snapshot <id> --file <path>` | `--snapshot <id>` `--file <path>` | Get file content from snapshot |
+| `open --snapshot <id> --file <path>` | `--snapshot <id>` `--file <path>` | Preview file content from snapshot |
+| `rollback --snapshot <id> --file <path>` | `--snapshot <id>` `--file <path>` | Rollback a single file from snapshot |
 
 ---
 
@@ -322,19 +359,30 @@ siyuan database [command] -w <path>
 ```
 
 ### Subcommands
-| Command | Description |
-|---------|-------------|
-| `search` | Search databases by name |
-| `get` | Get database content |
-| `keys` | List database keys (fields) |
-| `key add` | Add a key (field) to database |
-| `key remove` | Remove a key (field) from database |
-| `item add` | Add a row to database |
-| `item update` | Update a cell value |
-| `item remove` | Remove rows from database |
-| `render` | Render database data |
-| `unused` | List unused databases |
-| `clean` | Clean unused databases |
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `search <keyword>` | | Search databases by name |
+| `get --av <avID>` | `--av <avID>` (required) | Get database content |
+| `keys --av <avID>` | `--av <avID>` (required) | List database keys (fields) |
+| `render --av <avID>` | `--av <avID>` `-p, --page <int>` `-s, --size <int>` `--query <string>` `--view <viewID>` | Render database data |
+| `unused` | | List unused databases |
+| `clean` | `--av <avID>` (optional, default: clean all) | Clean unused databases |
+
+### database key — Nested Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `key add --av <avID> --name <name> --type <type>` | `--av <avID>` `--name <name>` `--type <type>` `--icon <icon>` `--prev <prevKeyID>` | Add a key (field) to database |
+| `key remove --av <avID> --key <keyID>` | `--av <avID>` `--key <keyID>` `--remove-relation-dest` | Remove a key (field) from database |
+
+### Key Types (`--type`)
+block/text/number/date/select/mSelect/url/email/phone/mAsset/template/created/updated/checkbox/relation/rollup/lineNumber
+
+### database item — Nested Subcommands
+| Command | Flags | Description |
+|---------|-------|-------------|
+| `item add --av <avID>` | `--av <avID>` `--block <blockID>` `--content <string>` `--detached` `--group <groupID>` `--previous <prevItemID>` `--view <viewID>` `--ignore-default-fill` | Add a row to database |
+| `item update --av <avID> --key <keyID> --item <itemID> --value <json>` | `--av <avID>` `--key <keyID>` `--item <itemID>` `--value <json>` | Update a cell value |
+| `item remove --av <avID> --ids <id1,id2,...>` | `--av <avID>` `--ids <ids>` | Remove rows from database |
 
 ---
 
@@ -362,15 +410,15 @@ siyuan file [command] -w <path>
 ### Subcommands
 | Command | Flags | Description |
 |---------|-------|-------------|
-| `list --path <path>` | | List directory contents |
-| `read --path <path>` | | Read file content |
-| `write <path> [--file <src>]` | `--file <src>` | Write file content (from stdin or file) |
-| `copy --src <src> --dst <dst>` | | Copy file or directory |
-| `rename --old <old> --new <new>` | | Rename or move file |
-| `delete --path <path>` | | Delete file or directory |
-| `find --path <path>` | `--pattern <pattern>` | Find files under a path |
-| `grep --path <path>` | `--pattern <pattern>` | Search file contents with regex |
-| `stat --path <path>` | | Show file or directory info |
+| `list <path>` | | List directory contents |
+| `read <path>` | | Read file content |
+| `write <path> [--file <src>]` | `--file <src>` (default: stdin) | Write file content (from stdin or file) |
+| `copy <src> <dst>` | | Copy file or directory |
+| `rename <old> <new>` | | Rename or move file |
+| `delete <path>` | | Delete file or directory |
+| `find <path>` | `--include <glob>` `--limit <int>` (default: 200) | Find files under a path |
+| `grep --pattern <regex> --path <path>` | `--pattern <regex>` `--path <path>` `--context <int>` `--include <glob>` `--limit <int>` (default: 200) | Search file contents with regex |
+| `stat <path>` | | Show file or directory info |
 
 ---
 
@@ -431,7 +479,7 @@ Starts the SiYuan kernel HTTP server for API access.
 ### Flags
 | Flag | Description |
 |------|-------------|
-| `--workspace <path>` | Workspace path (optional, defaults to default workspace if not specified; note: only full form `--workspace`, not `-w`) |
+| `-w, --workspace <path>` | Workspace path (optional, defaults to default workspace if not specified) |
 | `--accessAuthCode <string>` | Access auth code |
 | `--attach-ui` | Attach kernel lifecycle to desktop UI process (used by Electron) |
 | `--lang <string>` | Language: ar/de/en/es/fr/he/hi/id/it/ja/ko/nl/pl/pt-BR/ru/sk/th/tr/uk/zh-CN/zh-TW |
